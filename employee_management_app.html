@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>👨🏻‍💻Employee Management System (EMS) - Enhanced</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        .modal {
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+
+        .modal.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(-10px);
+        }
+
+        .modal:not(.hidden) {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <!-- Login Screen -->
+    <div id="login-screen"
+        class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-sm space-y-6 border-t-8 border-indigo-600">
+        <header class="text-center space-y-2">
+            <h1 class="text-4xl font-extrabold text-gray-900 leading-tight">👨🏻‍💻 Login</h1>
+            <p class="text-lg text-gray-500">Sign in to your employee dashboard.</p>
+        </header>
+        <form id="login-form" class="space-y-4">
+            <div>
+                <label for="username" class="sr-only">Username</label>
+                <input type="text" id="username" placeholder="Username (e.g., manager)" required
+                    class="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <div>
+                <label for="password" class="sr-only">Password</label>
+                <input type="password" id="password" placeholder="Password" required
+                    class="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <button type="submit"
+                class="w-full p-3 bg-indigo-600 text-white font-semibold rounded-md shadow-lg hover:bg-indigo-700 transition duration-200 transform hover:scale-105">
+                Login
+            </button>
+            <div id="login-message" class="text-center text-sm text-red-500 hidden"></div>
+        </form>
+        <!-- <div class="text-center text-sm text-gray-500 p-4 border rounded-lg bg-gray-50">
+            <p class="font-bold mb-1">Test Credentials:</p>
+            <p>Admin: <span class="font-mono text-indigo-600">admin</span> / <span
+                    class="font-mono text-indigo-600">adminpassword</span></p>
+            <p>Manager: <span class="font-mono text-indigo-600">manager</span> / <span
+                    class="font-mono text-indigo-600">managerpassword</span></p>
+            <p>Employee: <span class="font-mono text-indigo-600">E1001</span> / <span
+                    class="font-mono text-indigo-600">anypass</span></p>
+        </div> -->
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="main-dashboard"
+        class="bg-white p-4 sm:p-8 rounded-2xl shadow-2xl w-full max-w-6xl space-y-6 border-t-8 border-indigo-600 animate-fade-in hidden">
+
+        <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+            <h1 class="text-3xl font-extrabold text-gray-900 leading-tight">EMS Control Panel</h1>
+            <div class="flex items-center space-x-4 ml-auto">
+                <span id="role-badge"
+                    class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full font-semibold text-sm"></span>
+                <button id="logout-btn"
+                    class="px-4 py-2 bg-red-600 text-white font-semibold rounded-md hover:bg-red-700 transition duration-200">
+                    Logout
+                </button>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="border-b border-gray-200">
+            <div class="flex flex-wrap space-x-2 sm:space-x-4 -mb-px text-sm font-medium text-center" id="nav-tabs">
+                <button data-view="dashboard-view"
+                    class="tab-button inline-block p-3 border-b-2 border-indigo-600 text-indigo-600 rounded-t-lg transition duration-150">Dashboard</button>
+                <button data-view="leave-management-view"
+                    class="tab-button inline-block p-3 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 rounded-t-lg transition duration-150">Leave
+                    Management</button>
+                <button data-view="time-tracking-view"
+                    class="tab-button inline-block p-3 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 rounded-t-lg transition duration-150">Time
+                    Tracking</button>
+            </div>
+        </nav>
+
+        <!-- --- VIEW CONTAINERS --- -->
+        <div id="content-views">
+
+            <!-- 1. Main Employee Dashboard View -->
+            <div id="dashboard-view" class="view-content space-y-6">
+
+                <!-- Statistics Section -->
+                <section id="stats-view" class="bg-gray-50 p-6 rounded-xl shadow-inner border border-gray-200">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Employee Statistics</h2>
+                    <div id="stats-content" class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                        <!-- Stats will be loaded here -->
+                        <div class="p-4 bg-white rounded-lg shadow-md border-t-4 border-indigo-400">
+                            <p class="text-sm text-gray-500">Total Employees</p>
+                            <p id="total-employees" class="text-3xl font-bold text-gray-800">...</p>
+                        </div>
+                        <div class="p-4 bg-white rounded-lg shadow-md border-t-4 border-purple-400">
+                            <p class="text-sm text-gray-500">Average Salary</p>
+                            <p id="avg-salary" class="text-3xl font-bold text-gray-800">...</p>
+                        </div>
+                        <div class="p-4 bg-white rounded-lg shadow-md border-t-4 border-green-400">
+                            <p class="text-sm text-gray-500">Departments</p>
+                            <div id="department-stats"
+                                class="text-left mt-2 text-gray-800 space-y-1 p-2 max-h-28 overflow-y-auto">
+                                <!-- Department stats will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <hr class="border-gray-300">
+
+                <!-- Add Employee Form Section (Admin only) -->
+                <section id="add-form-view" class="space-y-4">
+                    <h2 class="text-2xl font-bold text-gray-800">Add New Employee</h2>
+                    <form id="employee-form" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <input type="text" id="empId" placeholder="Employee ID (e.g., E1005)" required
+                                class="p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-indigo-500 transition duration-200">
+                            <input type="text" id="name" placeholder="Name" required
+                                class="p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-indigo-500 transition duration-200">
+                            <input type="email" id="email" placeholder="Email" required
+                                class="p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-indigo-500 transition duration-200">
+                            <input type="number" id="age" placeholder="Age" required
+                                class="p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-indigo-500 transition duration-200">
+                            <input type="number" id="salary" placeholder="Salary" required
+                                class="p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-indigo-500 transition duration-200">
+                            <input type="text" id="department" placeholder="Department" required
+                                class="p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-indigo-500 transition duration-200">
+                            <input type="tel" id="phone-number" placeholder="Phone Number" required
+                                class="p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-indigo-500 transition duration-200">
+                        </div>
+                        <div class="flex justify-end space-x-2">
+                            <button type="submit"
+                                class="w-full md:w-auto p-3 bg-indigo-600 text-white font-semibold rounded-md shadow-lg hover:bg-indigo-700 transition duration-200 transform hover:scale-105">
+                                Add Employee
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
+                <hr class="border-gray-300">
+
+                <!-- Employee List View -->
+                <section id="employee-list-section" class="space-y-4">
+                    <h2 class="text-2xl font-bold text-gray-800">Current Employees</h2>
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <input type="text" id="search-input" placeholder="Search by name, ID, or department..."
+                            class="flex-1 p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-indigo-500 transition duration-200">
+                        <!-- Sort/Filter Combo -->
+                        <select id="sort-filter-combo"
+                            class="p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-indigo-500 transition duration-200 w-full md:w-56">
+                            <option value="">Sort/Filter By</option>
+                            <option value="department">Department</option>
+                            <option value="salary-asc">Salary (Low to High)</option>
+                            <option value="salary-desc">Salary (High to Low)</option>
+                            <option value="age-asc">Age (Youngest First)</option>
+                            <option value="age-desc">Age (Oldest First)</option>
+                        </select>
+                    </div>
+
+                    <div id="employee-list" class="space-y-4">
+                        <div id="loading-indicator" class="text-center py-8">
+                            <div
+                                class="animate-spin rounded-full h-12 w-12 border-4 border-t-4 border-gray-300 border-t-indigo-500 mx-auto">
+                            </div>
+                            <p class="mt-4 text-gray-500">Loading employees...</p>
+                        </div>
+                        <div id="no-employees-message" class="text-center text-gray-500 hidden">
+                            <p class="text-lg">No employees added yet.</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div id="leave-management-view" class="view-content space-y-6 hidden">
+                <h2 class="text-3xl font-bold text-gray-800">📅 Leave & Time-Off Management</h2>
+
+                <section id="leave-request-form-section"
+                    class="bg-indigo-50 p-6 rounded-xl shadow border border-indigo-200">
+                    <h3 class="text-xl font-semibold text-indigo-800 mb-4">Request Time Off</h3>
+                    <form id="leave-request-form" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <select id="leave-type" required
+                            class="p-3 rounded-md border border-indigo-300 focus:ring-2 focus:ring-indigo-500">
+                            <option value="" disabled selected>Select Leave Type</option>
+                            <option value="Vacation">Vacation</option>
+                            <option value="Sick">Sick Leave</option>
+                            <option value="Personal">Personal Day</option>
+                        </select>
+                        <input type="date" id="leave-start-date" required
+                            class="p-3 rounded-md border border-indigo-300 focus:ring-2 focus:ring-indigo-500">
+                        <input type="date" id="leave-end-date" required
+                            class="p-3 rounded-md border border-indigo-300 focus:ring-2 focus:ring-indigo-500">
+                        <textarea id="leave-reason" placeholder="Reason for leave" required
+                            class="md:col-span-2 p-3 rounded-md border border-indigo-300 focus:ring-2 focus:ring-indigo-500"></textarea>
+                        <button type="submit"
+                            class="p-3 bg-indigo-600 text-white font-semibold rounded-md shadow-lg hover:bg-indigo-700 transition duration-200">
+                            Submit Request
+                        </button>
+                    </form>
+                </section>
+
+                <section id="pending-leave-section" class="space-y-4">
+                    <h3 class="text-xl font-semibold text-gray-800">Pending Leave Requests</h3>
+                    <div class="overflow-x-auto bg-white rounded-xl shadow">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Employee</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Type</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Dates</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Reason</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Status</th>
+                                    <th id="leave-action-header"
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden">
+                                        Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leave-request-list" class="bg-white divide-y divide-gray-200">
+                                <!-- Leave requests will be rendered here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+            <div id="time-tracking-view" class="view-content space-y-6 hidden">
+                <h2 class="text-3xl font-bold text-gray-800">⏱️ Time & Attendance Tracking</h2>
+
+                <!-- Clock-In/Clock-Out Button (Employee Feature) -->
+                <section id="time-clock-section"
+                    class="bg-yellow-50 p-6 rounded-xl shadow border border-yellow-200 text-center">
+                    <p class="text-lg font-medium text-gray-600 mb-4">Your current status:</p>
+                    <div class="flex justify-center items-center space-x-4">
+                        <span id="clock-status-display"
+                            class="text-2xl font-bold px-4 py-2 rounded-lg shadow-inner transition duration-300">
+                            Clocked Out
+                        </span>
+                        <button id="time-clock-btn"
+                            class="px-8 py-3 bg-green-600 text-white font-bold rounded-full shadow-lg hover:bg-green-700 transition duration-300 transform hover:scale-105">
+                            Clock In
+                        </button>
+                    </div>
+                </section>
+
+                <section id="time-log-section" class="space-y-4">
+                    <h3 class="text-xl font-semibold text-gray-800">Recent Time Logs</h3>
+                    <div class="overflow-x-auto bg-white rounded-xl shadow">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider time-log-manager-only">
+                                        Employee</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Clock In</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Clock Out</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Duration (h)</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="time-log-list" class="bg-white divide-y divide-gray-200">
+                                <!-- Time logs will be rendered here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Employee Details Modal -->
+        <div id="details-modal"
+            class="modal fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
+            <div class="bg-white p-6 rounded-lg shadow-2xl max-w-lg w-full space-y-4">
+                <div class="flex justify-between items-center">
+                    <h3 id="details-name" class="text-2xl font-bold text-gray-800"></h3>
+                    <button id="close-details-modal" class="text-gray-400 hover:text-gray-600 transition duration-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <div id="details-content" class="space-y-2">
+                    <!-- Employee details will be populated here -->
+                </div>
+                <div id="details-actions" class="flex justify-end space-x-2">
+                    <button id="edit-details-btn"
+                        class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition duration-200">Edit</button>
+                    <button id="delete-details-btn"
+                        class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition duration-200">Delete</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="edit-modal"
+            class="modal fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
+            <div class="bg-white p-6 rounded-lg shadow-2xl max-w-lg w-full space-y-4">
+                <h3 class="text-2xl font-bold text-gray-800">Edit Employee Details</h3>
+                <form id="edit-employee-form" class="space-y-4">
+                    <input type="hidden" id="edit-empId">
+                    <div>
+                        <label for="edit-name" class="block text-sm font-medium text-gray-700">Name</label>
+                        <input type="text" id="edit-name" required
+                            class="mt-1 block w-full p-2 rounded-md border border-gray-300 focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label for="edit-email" class="block text-sm font-medium text-gray-700">Email</label>
+                        <input type="email" id="edit-email" required
+                            class="mt-1 block w-full p-2 rounded-md border border-gray-300 focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label for="edit-age" class="block text-sm font-medium text-gray-700">Age</label>
+                        <input type="number" id="edit-age" required
+                            class="mt-1 block w-full p-2 rounded-md border border-gray-300 focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label for="edit-salary" class="block text-sm font-medium text-gray-700">Salary</label>
+                        <input type="number" id="edit-salary" required
+                            class="mt-1 block w-full p-2 rounded-md border border-gray-300 focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label for="edit-department" class="block text-sm font-medium text-gray-700">Department</label>
+                        <input type="text" id="edit-department" required
+                            class="mt-1 block w-full p-2 rounded-md border border-gray-300 focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label for="edit-phone-number" class="block text-sm font-medium text-gray-700">Phone
+                            Number</label>
+                        <input type="tel" id="edit-phone-number" required
+                            class="mt-1 block w-full p-2 rounded-md border border-gray-300 focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div class="flex justify-end space-x-2">
+                        <button type="button" id="edit-cancel-btn"
+                            class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition duration-200">Cancel</button>
+                        <button type="submit" id="edit-save-btn"
+                            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition duration-200">Save
+                            Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Confirmation Modal -->
+        <div id="confirmation-modal"
+            class="modal fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
+            <div class="bg-white p-6 rounded-lg shadow-2xl max-w-sm w-full space-y-4">
+                <h3 id="modal-title" class="text-xl font-bold text-gray-800"></h3>
+                <p id="modal-message" class="text-gray-600"></p>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" id="modal-cancel-btn"
+                        class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition duration-200">Cancel</button>
+                    <button type="button" id="modal-confirm-btn"
+                        class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition duration-200">Confirm</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="message-box"
+            class="modal fixed top-4 right-4 bg-white p-4 rounded-lg shadow-xl text-gray-800 border-l-4 border-green-500 hidden z-50">
+            <p id="message-text"></p>
+        </div>
+
+        <!-- Employee Profile Section (visible only for Employee role) -->
+        <section id="employee-profile-section"
+            class="bg-blue-50 p-6 rounded-xl shadow-inner border border-blue-200 mb-6 hidden">
+            <h2 class="text-2xl font-bold text-blue-800 mb-4">My Profile</h2>
+            <div id="employee-profile-content" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </section>
+    </div>
+
+    <script src="script.js">
+
+    </script>
+</body>
+
+</html>
