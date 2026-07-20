@@ -1,84 +1,184 @@
-# Employee Management System (EMS)
+# 🏢 Employee Management System (EMS)
 
-A premium, full-stack Employee Management System built with a sleek glassmorphic slate dark-mode UI, powered by a Python Flask backend and MySQL database.
+[![Python Version](https://img.shields.io/badge/python-3.8%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/flask-v3.0.2-000000?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
+[![MySQL](https://img.shields.io/badge/mysql-8.0%2B-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
+[![JavaScript](https://img.shields.io/badge/javascript-ES6%2B-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/)
+[![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)](LICENSE)
+
+> A modern, full-stack Enterprise Employee Management System featuring a high-performance **Python Flask REST API**, robust **MySQL relational database**, and a stunning **glassmorphic dark-mode dashboard** with Role-Based Access Control (RBAC), analytics, time tracking, and leave management.
 
 ---
 
-## 🚀 Features
+## 📸 Overview & Architecture
 
-- **Slate Dark-Mode Dashboard**: Built with custom Google Fonts (*Outfit* & *Plus Jakarta Sans*), micro-interactions, custom scrollbars, and full responsive design.
-- **Dynamic Analytics**: Real-time stats counting total active employees, average salary, and department distribution charts powered by **Chart.js**.
-- **Employee CRUD (Admin Only)**: Admin roles can add, edit, and delete employee records directly mapping to the database.
-- **Leave & Time-Off Management**: 
-  - Employees can request time-off.
-  - Admins and Managers can review pending requests and approve/reject them.
-- **Attendance & Time Tracking**:
-  - Employees can clock in and clock out dynamically.
-  - Active session state is updated on the database.
-  - Displays formatted worked logs with durations.
-- **Toast Notifications**: Interactive animated Toast notifications popup from the bottom-right corner for clean success/error message visibility.
+EMS is designed to streamline corporate workforce administration. It offers real-time payroll and employee analytics, automated time logs (clock-in/clock-out), dynamic leave approval workflows, and granular permission enforcement across three tier roles: **Admin**, **Manager**, and **Employee**.
+
+```mermaid
+graph TD
+    Client["💻 Modern Browser (HTML5 / Vanilla JS / Chart.js)"]
+    API["⚡ Flask RESTful API (Port 5000)"]
+    Middleware["🛡️ CORS & RBAC Token Decorators"]
+    Bcrypt["🔒 bcrypt Hashing & Security"]
+    Database[("🗄️ MySQL Database (ems_db)")]
+
+    Client -->|HTTP / JSON Requests| API
+    API --> Middleware
+    Middleware --> Bcrypt
+    Middleware -->|SQL Queries via mysql-connector| Database
+```
+
+---
+
+## ✨ Key Features
+
+- 🎨 **Glassmorphic UI / UX Design**
+  - Crafted with custom Google Fonts (*Outfit* & *Plus Jakarta Sans*), micro-interactions, smooth CSS animations, and custom scrollbars.
+  - Interactive toast notifications for real-time operation feedback.
+- 📊 **Real-Time Analytics Dashboard**
+  - Total active workforce counts, average salary metrics, department breakdown pie/bar charts powered by **Chart.js**.
+- 👥 **Comprehensive Employee CRUD**
+  - Full employee record creation, inline updating, and deletion (restricted to Admin role).
+  - Search and filter employees dynamically by department or role.
+- ⏱️ **Attendance & Time Tracking**
+  - Live clock-in / clock-out toggles for employees with automatic shift duration calculation (hours).
+  - Centralized time logging system for managerial audits.
+- 📅 **Leave Request & Approval System**
+  - Employees can submit time-off requests with date range and rationale.
+  - Admins and Managers can review, approve, or reject pending leave applications.
+- 🔐 **Role-Based Access Control (RBAC)**
+  - Granular server-side protection using custom Flask decorators (`@token_required`, `@admin_required`, `@admin_or_manager_required`).
+  - Hashed password verification using `bcrypt`.
+
+---
+
+## 🛡️ Access Control & User Roles
+
+| Role | Access Permissions | Primary Capabilities |
+| :--- | :--- | :--- |
+| **Admin** | 👑 Full System Access | Analytics, Employee CRUD, Leave Approval, View All Logs |
+| **Manager** | 💼 Supervisory Access | Analytics, Leave Approval, View All Logs |
+| **Employee** | 👤 Self-Service Access | Personal Profile, Clock In/Out, Submit Leave Requests |
 
 ---
 
 ## 📁 Repository Structure
 
-- `employee_management_app.html` - The static frontend HTML structure and style definitions.
-- `script.js` - Frontend API client and views controller.
-- `app.py` - Python Flask RESTful API server.
-- `db.sql` - MySQL Database schema and initial test user records.
-- `test_api.py` - Integration validation script to test endpoints.
+```
+EMS/
+├── app.py                         # Python Flask RESTful API server & RBAC middleware
+├── db.sql                         # MySQL Database schema & initial seed data
+├── employee_management_app.html   # Main Dashboard SPA UI layout & styles
+├── script.js                      # Frontend API client, DOM controller & Chart.js logic
+├── test_api.py                    # Automated API integration test suite
+├── .gitignore                     # Git ignore rules for virtual environment & cache
+└── README.md                      # Comprehensive project documentation
+```
 
 ---
 
-## 🛠️ Local Installation & Setup
+## 🛠️ Tech Stack
 
-### 1. Database Setup (MySQL)
-1. Ensure your local MySQL server is running.
-2. Run the SQL schema to create the database and seed initial test records:
-   ```bash
-   mysql -u root -p < db.sql
-   ```
-   *(Note: The default schema sets password hashes for users `admin`, `manager`, and `alice`)*.
-
-### 2. Python Environment Setup
-1. Inside the workspace folder, activate your python virtual environment:
-   ```bash
-   # Windows PowerShell
-   .\venv\Scripts\Activate.ps1
-   ```
-2. Install the required python dependencies:
-   ```bash
-   pip install Flask mysql-connector-python bcrypt
-   ```
-
-### 3. Running the Backend Server
-1. Run the Flask application:
-   ```bash
-   python app.py
-   ```
-2. The server will start on `http://127.0.0.1:5000/`. Manual CORS interceptors are built-in so that the local HTML file can communicate directly with this port.
-
-### 4. Running the Frontend
-Simply double-click or open `employee_management_app.html` in any modern web browser.
+- **Backend**: Python 3.x, Flask, `mysql-connector-python`, `bcrypt`
+- **Database**: MySQL 8.0+
+- **Frontend**: Single Page Application (HTML5, Vanilla CSS3, JavaScript ES6+)
+- **Visualization**: Chart.js
+- **Testing**: Python integration test suite (`test_api.py`)
 
 ---
 
-## 🔑 Test Credentials
+## ⚡ Quickstart & Local Setup
 
-| Username | Password | Role | Employee ID Link |
+### 1. Database Initialization
+Ensure your local MySQL server is running, then execute `db.sql` to build the database schema and seed default records:
+
+```bash
+mysql -u root -p < db.sql
+```
+
+*(This creates the `ems_db` schema with `users`, `employees`, `leave_requests`, and `time_logs` tables).*
+
+### 2. Python Virtual Environment Setup
+Create and activate a Python virtual environment:
+
+```bash
+# Windows PowerShell
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+
+# Linux / macOS
+python3 -m venv venv
+source venv/bin/activate
+```
+
+Install the required dependencies:
+```bash
+pip install Flask mysql-connector-python bcrypt requests
+```
+
+### 3. Database Configuration
+Open `app.py` and update the `DB_CONFIG` dictionary to match your MySQL connection credentials:
+
+```python
+DB_CONFIG = {
+    'host': 'localhost',
+    'user': 'root',        # Your MySQL username
+    'password': 'your_password', # Your MySQL password
+    'database': 'ems_db'
+}
+```
+
+### 4. Running the Backend REST API
+Launch the Flask development server:
+
+```bash
+python app.py
+```
+*The server will start on `http://127.0.0.1:5000/` with automatic CORS handling enabled.*
+
+### 5. Launching the Frontend
+Open `employee_management_app.html` directly in any standard web browser (or serve it using VS Code Live Server).
+
+---
+
+## 🔑 Demo Test Credentials
+
+| Username | Password | Role | Linked Employee ID |
 | :--- | :--- | :--- | :--- |
-| `admin` | `adminpassword` | **Admin** | None (Access to all stats, CRUD, leaves approval) |
-| `manager` | `managerpassword` | **Manager** | None (Access to stats, leaves approval) |
-| `alice` | `anypass` | **Employee** | `E1001` (Access to profile, clock-in, leave requests) |
+| `admin` | `adminpassword` | **Admin** | *N/A (System Administrator)* |
+| `manager` | `managerpassword` | **Manager** | *N/A (Supervisory Manager)* |
+| `alice` | `anypass` | **Employee** | `E1001` |
 
 ---
 
-## 🧪 Integration Verification
+## 📡 API Endpoints Reference
 
-You can run the programmatic API testing suite to confirm all backend routing and SQL formatting is verified:
+| Endpoint | Method | Role Required | Description |
+| :--- | :--- | :--- | :--- |
+| `/api/login` | `POST` | Public | Authenticate user & receive session token |
+| `/api/employees` | `GET` | Authenticated | Fetch all employee records |
+| `/api/employees` | `POST` | `Admin` | Add new employee record |
+| `/api/employees/<id>` | `PUT` | `Admin` | Update existing employee profile |
+| `/api/employees/<id>` | `DELETE` | `Admin` | Delete employee record |
+| `/api/leaves` | `GET` | Authenticated | Get leave requests (Employee's own or All) |
+| `/api/leaves` | `POST` | `Employee` | Submit a new leave request |
+| `/api/leaves/<id>` | `PUT` | `Admin` / `Manager` | Approve or reject leave request |
+| `/api/time/status` | `GET` | `Employee` | Check active clock-in status |
+| `/api/time/clock` | `POST` | `Employee` | Clock in or clock out |
+| `/api/time/logs` | `GET` | Authenticated | Retrieve time & attendance logs |
+
+---
+
+## 🧪 Integration Testing
+
+Execute the automated backend API test suite to verify database connection, token authentication, CRUD operations, and time logging:
+
 ```bash
 python test_api.py
 ```
-This tests session login, employees CRUD operations, attendance clock-in status, and leaves approval logs.
 
 ---
+
+## 📄 License
+
+This project is open-source and available under the [MIT License](LICENSE).
